@@ -2,6 +2,7 @@
   "name": "rct-project-template",
   "build": { "dockerfile": "Dockerfile" },
   "overrideCommand": false,
+  "workspaceFolder": "/workspaces/${localWorkspaceFolderBasename}",
   "remoteUser": "rstudio",
   "containerEnv": {
     "PASSWORD": "rstudio"

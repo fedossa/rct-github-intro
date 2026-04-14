@@ -124,8 +124,8 @@ docker run --rm -it \
   -e USERID=$(id -u) \
   -e GROUPID=$(id -g) \
   -p 8787:8787 \
-  -v "$PWD":/home/rstudio/project \
-  -w /home/rstudio/project \
+  -v "$PWD":/workspaces/$(basename "$PWD") \
+  -w /workspaces/$(basename "$PWD") \
   rct-project-template
 ```
 
@@ -134,9 +134,10 @@ Then open `http://localhost:8787` and log in with:
 - username: `rstudio`
 - password: `rstudio`
 
-The repository is mounted at `/home/rstudio/project`, which is already trusted for Git inside the image. If RStudio does not open there automatically, use `File -> Open Project` or the Files pane to open the project folder. Then run:
+The repository is mounted at `/workspaces/<your-repo-folder>`. If RStudio does not open there automatically, use `File -> Open Project` or the Files pane to open the project folder. Then run:
 
 ```bash
+git config --global --add safe.directory "$(pwd)"
 git config --global user.name "Your Name"
 git config --global user.email "you@example.com"
 gh auth login

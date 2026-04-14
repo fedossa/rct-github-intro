@@ -39,8 +39,7 @@ RUN set -eux; \
   dpkg -i /tmp/quarto.deb; \
   rm /tmp/quarto.deb
 
-RUN mkdir -p /home/rstudio/project \
- && chown -R rstudio:rstudio /home/rstudio /opt/TinyTeX \
- && git config --system --add safe.directory /home/rstudio/project
+RUN mkdir -p /workspaces \
+ && chown -R rstudio:rstudio /home/rstudio /opt/TinyTeX /workspaces
 
-WORKDIR /home/rstudio/project
+WORKDIR /workspaces
