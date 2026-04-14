@@ -1,6 +1,6 @@
 # rct-project-template
 
-This repository is the **R version of a barebones project template**. It is meant to be small enough to understand quickly, but structured enough to grow into a real project.
+This repository is the **Python version of a barebones project template**. It is meant to be small enough to understand quickly, but structured enough to grow into a real project.
 
 The main idea is simple:
 
@@ -15,9 +15,9 @@ So even though the example uses the tiny `mtcars` dataset, the workflow is alrea
 
 This repository gives you a minimal project skeleton with four visible stages:
 
-1. `code/R/pull_data.R`
-2. `code/R/prep_data.R`
-3. `code/R/run_analysis.R`
+1. `code/python/pull_data.py`
+2. `code/python/prep_data.py`
+3. `code/python/run_analysis.py`
 4. `doc/paper.qmd`
 
 The point is not the `mtcars` analysis itself. The point is to give you a clean starting structure that you can keep extending for your own work.
@@ -28,12 +28,14 @@ If you later look at `trr266/treat`, you will see the same broad movement in a r
 
 ```text
 .devcontainer/
+.python-version
 README.md
 Makefile
-rct-project-template.Rproj
-code/R/pull_data.R
-code/R/prep_data.R
-code/R/run_analysis.R
+pyproject.toml
+uv.lock
+code/python/pull_data.py
+code/python/prep_data.py
+code/python/run_analysis.py
 data/
   external/
   pulled/
@@ -49,10 +51,10 @@ output/
 
 The workflow is intentionally explicit:
 
-1. `pull_data.R` creates a raw object in `data/pulled/`
-2. `prep_data.R` reads that raw object and creates a prepared analysis dataset in `data/generated/`
-3. `run_analysis.R` reads the prepared dataset and writes a serialized `.rds` results bundle to `output/`
-4. `doc/paper.qmd` reads that `.rds` bundle and renders the paper
+1. `pull_data.py` creates a raw object in `data/pulled/`
+2. `prep_data.py` reads that raw object and creates a prepared analysis dataset in `data/generated/`
+3. `run_analysis.py` reads the prepared dataset and writes a serialized `.pkl` results bundle to `output/`
+4. `doc/paper.qmd` reads that `.pkl` bundle and renders the paper
 
 The paper does **not** rerun the full analysis pipeline internally. It consumes prepared results from `output/`.
 
@@ -60,11 +62,11 @@ The paper does **not** rerun the full analysis pipeline internally. It consumes 
 
 The `data/` folder keeps the same conceptual separation used in `treat`:
 
-- `data/external/`: files that come from outside the repo and are kept as source material
+- `data/external/`: files that come from outside the repository and are kept as source material
 - `data/pulled/`: raw data written by a pull step
 - `data/generated/`: prepared datasets created from raw or external inputs
 
-In this template, the pull step uses the built-in `mtcars` dataset, so `data/external/` starts empty. The folder is still there so you can swap in your own real project data later without changing the overall structure.
+In this template, the pull step uses the built-in `mtcars` dataset that ships with `plotnine`, so `data/external/` starts empty. The folder is still there so you can swap in your own real project data later without changing the overall structure.
 
 ## References
 
@@ -80,7 +82,7 @@ There are three ways to work with this repo:
 
 1. **GitHub Codespaces**
    This is the recommended path.
-2. **Local Docker + browser-based RStudio Server**
+2. **Local VS Code + Docker Dev Containers**
    This is the recommended local path.
 3. **Fully local install**
    This is possible, but not recommended.
@@ -89,75 +91,51 @@ There are three ways to work with this repo:
 
 1. Use this template on GitHub to create your own repository.
 2. Open your repository in Codespaces.
-3. Wait for the container to finish building.
-4. Open the forwarded port `8787` for RStudio Server.
-5. Log in with:
-   - username: `rstudio`
-   - password: `rstudio`
-6. If RStudio Server opens in the home directory and you do not see the project files yet, that is expected. Use `File -> Open Project`, paste `/workspaces/rct-project-template/rct-project-template.Rproj` into the `File name` field, and open it. If your repository folder has a different name, replace the middle `rct-project-template` folder segment with your actual repository folder name.
-7. In the RStudio Terminal, run:
+3. Wait for the devcontainer to finish building.
+4. Wait for the post-create step to finish running `uv sync`.
+5. In the Codespaces terminal, run:
 
 ```bash
 git config --global user.name "Your Name"
 git config --global user.email "you@example.com"
 gh auth login
-```
-
-Then run:
-
-```bash
 make
 ```
 
-### 2. Local Docker + RStudio Server
+The repository-local virtual environment lives at `.venv/`. Codespaces should detect it automatically and use it as the Python interpreter. The interpreter itself is managed by `uv`, which downloads the Python version pinned in `.python-version`.
 
-Build the image from the repository root:
+### 2. Local VS Code + Docker Dev Containers
 
-```bash
-docker build -f .devcontainer/Dockerfile -t rct-project-template .
-```
-
-Run the container:
-
-```bash
-docker run --rm -it \
-  -e PASSWORD=rstudio \
-  -e USERID=$(id -u) \
-  -e GROUPID=$(id -g) \
-  -p 8787:8787 \
-  -v "$PWD":/workspaces/$(basename "$PWD") \
-  -w /workspaces/$(basename "$PWD") \
-  rct-project-template
-```
-
-Then open `http://localhost:8787` and log in with:
-
-- username: `rstudio`
-- password: `rstudio`
-
-The repository is mounted at `/workspaces/<your-repo-folder>`. If RStudio Server opens in the home directory and you do not see the project files yet, that is expected. Use `File -> Open Project`, paste `/workspaces/rct-project-template/rct-project-template.Rproj` into the `File name` field, and open it. If your repository folder has a different name, replace the middle `rct-project-template` folder segment with your actual repository folder name. Then run:
+1. Install Docker.
+2. Install VS Code plus the Dev Containers extension.
+3. Open the repository in VS Code.
+4. Run `Dev Containers: Reopen in Container` from the Command Palette.
+5. Wait for the devcontainer build and the post-create `uv sync` step to finish.
+6. In the integrated terminal inside the container, run:
 
 ```bash
-git config --global --add safe.directory "$(pwd)"
 git config --global user.name "Your Name"
 git config --global user.email "you@example.com"
 gh auth login
 make
 ```
+
+The devcontainer keeps the project virtual environment in `.venv/` and configures VS Code to use it automatically. `uv` also manages the Python interpreter for that environment, so the container image does not need to ship the project Python version directly.
 
 ### 3. Fully Local Install
 
 You can also run the project outside containers, but this is **not recommended** unless you are comfortable managing the stack yourself:
 
-- R
+- `uv`
 - Quarto
-- TinyTeX or another LaTeX installation
-- the required R packages
+- a LaTeX installation capable of rendering PDFs
 - Git and optionally GitHub CLI
 
-If you choose this route, the project command is still:
+If you choose this route, run:
 
 ```bash
+uv sync --managed-python
+source .venv/bin/activate
 make
 ```
 
@@ -171,16 +149,16 @@ make
 
 The Makefile runs the full pipeline in order:
 
-1. `code/R/pull_data.R`
-2. `code/R/prep_data.R`
-3. `code/R/run_analysis.R`
+1. `code/python/pull_data.py`
+2. `code/python/prep_data.py`
+3. `code/python/run_analysis.py`
 4. `doc/paper.qmd`
 
 ## Outputs
 
 The main analytical output is:
 
-- `output/rct-project-template-results.rds`
+- `output/rct-project-template-results.pkl`
 
 The final paper is written to:
 
@@ -199,13 +177,14 @@ The current template shows one descriptive table, one figure, and one bibliograp
 
 ## Container Notes
 
-Both Codespaces and the local Docker path provide:
+Both Codespaces and the local devcontainer path provide:
 
-- RStudio Server on port `8787`
+- `uv`
 - `git`
 - `gh`
 - Quarto
 - TinyTeX
-- the R packages needed for this template
 
-This keeps the working environment consistent across students.
+In both container paths, `uv` downloads and manages the Python interpreter pinned for the project. This keeps the working environment consistent across students without baking the project Python version into the base image.
+
+To keep the image build lighter, the devcontainer does not preinstall an extra bundle of LaTeX packages. If Quarto reports a missing LaTeX package when rendering `output/rct-project-template-paper.pdf`, install that package on demand with `tlmgr install <package>`.

@@ -1,7 +1,7 @@
 ---
 title: |
   | A Minimal Research Project Template
-  | An Illustrative Example in R
+  | An Illustrative Example in Python
 author:
   - name: Course Template
     email: your.name@example.com
@@ -13,7 +13,7 @@ execute:
   message: false
   warning: false
 abstract: |
-  | \vfill This paper demonstrates a minimal reproducible R workflow for class assignments. The project uses a tiny `mtcars` example, but preserves the basic logic of a larger empirical workflow: data are pulled, prepared, analyzed, serialized to disk, and then imported into the paper as prepared results.
+  | \vfill This paper demonstrates a minimal reproducible Python workflow for class assignments. The project uses a tiny `mtcars` example, but preserves the basic logic of a larger empirical workflow: data are pulled, prepared, analyzed, serialized to disk, and then imported into the paper as prepared results.
   | \vspace{6cm}
 bibliography: references.bib
 format:
@@ -42,52 +42,79 @@ header-includes:
   - \usepackage{booktabs}
 ---
 
-```{r setup, include=FALSE}
-library(knitr)
-library(ggplot2)
+```{python}
+#| label: setup
+#| include: false
 
-results <- readRDS("../output/rct-project-template-results.rds")
-descriptive_table <- results$descriptive_table
-scatter_figure <- results$scatter_figure
-table_note <- results$table_note
-highlights <- results$highlights
+import pickle
+from pathlib import Path
+from IPython.display import Image, display
 
-render_table <- function(data, note) {
-  table_lines <- capture.output(
-    kable(
-      data,
-      format = "latex",
-      booktabs = TRUE,
-      linesep = "",
-      align = c("l", "r", "r", "r", "r")
-    )
-  )
+results_path = Path("../output/rct-project-template-results.pkl")
+with results_path.open("rb") as results_file:
+    results = pickle.load(results_file)
 
-  latex_table <- c(
+descriptive_table = results["descriptive_table"]
+scatter_figure_path = (Path("..") / results["scatter_figure_path"]).resolve()
+table_note = results["table_note"]
+highlights = results["highlights"]
+
+
+def render_table(data, note):
+  table_lines = [
+      "\\begin{tabular}[t]{lrrrr}",
+      "\\toprule",
+      " & ".join(str(column) for column in data.columns) + "\\\\",
+      "\\midrule"
+  ]
+
+  for row in data.itertuples(index=False, name=None):
+    rendered_cells = []
+    for value in row:
+      value = value.item() if hasattr(value, "item") else value
+      if isinstance(value, float):
+        rendered_cells.append(f"{value:.1f}")
+      else:
+        rendered_cells.append(str(value))
+    table_lines.append(" & ".join(rendered_cells) + "\\\\")
+
+  table_lines.extend([
+      "\\bottomrule",
+      "\\end{tabular}"
+  ])
+
+  latex_table = [
     "\\begin{threeparttable}",
-    table_lines,
+    *table_lines,
     "\\begin{tablenotes}[flushleft]",
     "\\setlength{\\labelsep}{0pt}",
-    paste0("\\item \\emph{Note}: ", note),
+    f"\\item \\emph{{Note}}: {note}",
     "\\end{tablenotes}",
     "\\end{threeparttable}"
-  )
+  ]
 
-  cat(paste(latex_table, collapse = "\n"))
-}
+  print("\n".join(latex_table))
 ```
 
 \pagebreak
 
 # Introduction
 
-This repository is the R version of a barebones project template for class assignments. It keeps the moving parts of a larger workflow visible while staying small enough to understand in one sitting. Data move through a pull step, a preparation step, an analysis step, and finally into a paper that reads saved results rather than re-running the analytical pipeline. The paper structure is intentionally compact, but it already includes standard scholarly features such as citations and a bibliography [@Wickham2014].
+This repository is the Python version of a barebones project template for class assignments. It keeps the moving parts of a larger workflow visible while staying small enough to understand in one sitting. Data move through a pull step, a preparation step, an analysis step, and finally into a paper that reads saved results rather than re-running the analytical pipeline. The paper structure is intentionally compact, but it already includes standard scholarly features such as citations and a bibliography [@Wickham2014].
 
 # Data
 
-The example uses the built-in `mtcars` dataset. In this template, `code/R/pull_data.R` writes a raw object to `data/pulled/`, `code/R/prep_data.R` creates a prepared analysis dataset in `data/generated/`, and `code/R/run_analysis.R` reads that prepared dataset to create the final analytical objects stored in `output/`.
+The example uses the built-in `mtcars` dataset that ships with `plotnine`. In this template, `code/python/pull_data.py` writes a raw object to `data/pulled/`, `code/python/prep_data.py` creates a prepared analysis dataset in `data/generated/`, and `code/python/run_analysis.py` reads that prepared dataset to create the final analytical objects stored in `output/`.
 
-The prepared sample contains `r highlights$sample_size` observations. Average fuel efficiency is `r highlights$avg_mpg` miles per gallon, average horsepower is `r highlights$avg_horsepower`, and the heaviest vehicle in the sample is `r highlights$heaviest_model`.
+```{python}
+#| output: asis
+print(
+    f"The prepared sample contains {highlights['sample_size']} observations. "
+    f"Average fuel efficiency is {highlights['avg_mpg']} miles per gallon, "
+    f"average horsepower is {highlights['avg_horsepower']}, and the heaviest "
+    f"vehicle in the sample is {highlights['heaviest_model']}."
+)
+```
 
 # Analysis
 
@@ -95,20 +122,29 @@ The analysis step estimates a simple linear model of miles per gallon as a funct
 
 # Results
 
-```{r, results="asis"}
+```{python}
 #| label: tbl-summary
 #| tbl-cap: Descriptive statistics by transmission show that manual cars in the prepared sample are lighter and more fuel efficient on average.
+#| output: asis
 render_table(descriptive_table, table_note)
 ```
 
-```{r}
+```{python}
 #| label: fig-weight
 #| fig-cap: Fuel efficiency declines with vehicle weight in the prepared sample, with manual cars concentrated among the lighter and more efficient models.
 #| out-width: 85%
-scatter_figure
+display(Image(filename=str(scatter_figure_path)))
 ```
 
-The fitted model implies a `r highlights$weight_slope` mpg change for an additional 1,000 pounds of vehicle weight. The coefficient on manual transmission is `r highlights$manual_effect` mpg. `r highlights$interpretation`
+```{python}
+#| output: asis
+print(
+    f"The fitted model implies a {highlights['weight_slope']} mpg change for "
+    f"an additional 1,000 pounds of vehicle weight. The coefficient on manual "
+    f"transmission is {highlights['manual_effect']} mpg. "
+    f"{highlights['interpretation']}"
+)
+```
 
 # Conclusion
 

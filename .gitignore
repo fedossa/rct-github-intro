@@ -2,9 +2,13 @@
 .DS_Store
 *.log
 
-# R / Quarto
-.Rproj.user
-.Rhistory
+# Python
+.venv/
+__pycache__/
+*.pyc
+.ipynb_checkpoints/
+
+# Quarto
 .quarto
 /.vscode
 /.quarto/
