@@ -1,86 +1,42 @@
-# If you are new to Makefiles: https://makefiletutorial.com
+RSCRIPT := Rscript --vanilla
+QUARTO := quarto
 
-# Config
+PULLED := data/pulled/mtcars_raw.rds
+GENERATED := data/generated/mtcars_prepared.rds
+RESULTS := output/rct-project-template-results.rds
+OLD_RESULTS := output/rct-github-intro-results.rds
+PAPER_BASENAME := rct-project-template-paper.pdf
+OLD_PAPER := output/rct-github-intro-paper.pdf
+PAPER := output/$(PAPER_BASENAME)
+SOURCE := doc/paper.qmd
 
-PYTHON := python
+.PHONY: all clean
 
-RSCRIPT := Rscript --encoding=UTF-8
+all: $(PAPER)
 
-CONFIG := config/global_cfg.yaml
+$(PULLED): code/R/pull_data.R
+	mkdir -p data/pulled
+	$(RSCRIPT) $<
 
-PULL_WRDS_DATA_CFG := config/pull_wrds_data_cfg.yaml
+$(GENERATED): code/R/prep_data.R $(PULLED)
+	mkdir -p data/generated
+	$(RSCRIPT) $<
 
+$(RESULTS): code/R/run_analysis.R $(GENERATED)
+	mkdir -p output
+	$(RSCRIPT) $<
 
-# Refer to `config/global_cfg.yaml` for file locations
-
-# Output Targets
-
-PAPER := $(shell yq -r '.output_paper' $(CONFIG))
-
-PRESENTATION :=  $(shell yq -r '.output_presentation' $(CONFIG))
-
-TARGETS :=  $(PAPER) $(PRESENTATION)
-
-
-# Input Targets
-
-SECRETS := $(shell yq -r '.secrets_file' $(CONFIG))
-
-EXTERNAL_DATA := $(shell yq -r '.fama_french_12' $(CONFIG)) \
-	$(shell yq -r '.fama_french_48' $(CONFIG))
-
-WRDS_DATA := $(shell yq -r '.cstat_us_parquet_file' $(CONFIG))
-
-GENERATED_DATA := $(shell yq -r '.acc_sample' $(CONFIG))
-
-RESULTS := $(shell yq -r '.results_r' $(CONFIG))
-
-
-# Phony Targets 
-
-.phony: all clean very-clean dist-clean
-
-all: $(TARGETS)
+$(PAPER): $(SOURCE) $(RESULTS)
+	rm -rf .quarto doc/.quarto
+	cd doc && $(QUARTO) render paper.qmd --to pdf --output $(PAPER_BASENAME)
+	rm -f paper.tex paper.log paper.aux paper.out paper.knit.md
+	rm -f $(PAPER_BASENAME)
+	rm -f texput.log doc/texput.log
+	rm -f doc/paper.tex doc/paper.log doc/paper.aux doc/paper.out doc/paper.knit.md doc/paper.fff doc/paper.ttt
 
 clean:
-	rm -f $(TARGETS)
-	rm -f $(RESULTS)
-	rm -f $(GENERATED_DATA)
-
-very-clean: clean
-	rm -f $(WRDS_DATA)
-
-dist-clean: very-clean
-	rm secrets.env
-
-
-# Recipes for intermediate targets
-
-$(SECRETS):
-	@echo "To start, you need to copy _$(SECRETS) to $(SECRETS) and edit it"
-	@false
-
-$(WRDS_DATA): code/python/pull_wrds_data.py $(SECRETS) \
-	$(PULL_DATA_CFG) $(CONFIG)
-	$(PYTHON) $<
-
-$(GENERATED_DATA): code/python/prepare_data.py $(WRDS_DATA) $(CONFIG) \
-	$(EXTERNAL_DATA) $(PREPARE_DATA_CFG)
-	$(PYTHON) $<
-
-$(RESULTS):	$(GENERATED_DATA) code/R/do_analysis.R code/R/utils.R $(CONFIG)
-	$(RSCRIPT) code/R/do_analysis.R
-
-
-# Recipes for final targets
-
-$(PAPER): doc/paper_r.qmd doc/references.bib $(RESULTS)
-	quarto render doc/paper_r.qmd --quiet
-	mv output/paper_r.pdf $(PAPER)
-	rm -f doc/paper_r.ttt doc/paper_r.fff
-
-$(PRESENTATION): doc/presentation_r.qmd $(RESULTS) \
-	doc/beamer_theme_trr266.sty
-	quarto render doc/presentation_r.qmd --quiet
-	mv output/presentation_r.pdf $(PRESENTATION)
-	rm -rf output/presentation_r_files
+	rm -rf .quarto doc/.quarto
+	rm -f $(PULLED) $(GENERATED) $(RESULTS) $(PAPER) $(OLD_RESULTS) $(OLD_PAPER)
+	rm -f paper.tex paper.log paper.aux paper.out paper.knit.md
+	rm -f texput.log doc/texput.log
+	rm -f doc/paper.tex doc/paper.log doc/paper.aux doc/paper.out doc/paper.knit.md doc/paper.fff doc/paper.ttt

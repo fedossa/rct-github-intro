@@ -1,21 +1,10 @@
-# Local and project stuff
+# Local files
 .DS_Store
 *.log
-public/
-playground.R
-playground.py
-secrets.env
 
-# Python stuff
-__pycache__/
-.venv
-venv
-treat.egg-info/
-
-
-# R Stuff
+# R / Quarto
 .Rproj.user
-*.Rproj
 .Rhistory
 .quarto
 /.vscode
+/.quarto/
