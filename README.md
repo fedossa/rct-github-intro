@@ -94,7 +94,8 @@ There are three ways to work with this repo:
 5. Log in with:
    - username: `rstudio`
    - password: `rstudio`
-6. In the RStudio Terminal, run:
+6. If RStudio Server opens in the home directory and you do not see the project files yet, that is expected. Use `File -> Open Project`, paste `/workspaces/rct-project-template/rct-project-template.Rproj` into the `File name` field, and open it. If your repository folder has a different name, replace the middle `rct-project-template` folder segment with your actual repository folder name.
+7. In the RStudio Terminal, run:
 
 ```bash
 git config --global user.name "Your Name"
@@ -134,7 +135,7 @@ Then open `http://localhost:8787` and log in with:
 - username: `rstudio`
 - password: `rstudio`
 
-The repository is mounted at `/workspaces/<your-repo-folder>`. If RStudio does not open there automatically, use `File -> Open Project` or the Files pane to open the project folder. Then run:
+The repository is mounted at `/workspaces/<your-repo-folder>`. If RStudio Server opens in the home directory and you do not see the project files yet, that is expected. Use `File -> Open Project`, paste `/workspaces/rct-project-template/rct-project-template.Rproj` into the `File name` field, and open it. If your repository folder has a different name, replace the middle `rct-project-template` folder segment with your actual repository folder name. Then run:
 
 ```bash
 git config --global --add safe.directory "$(pwd)"
