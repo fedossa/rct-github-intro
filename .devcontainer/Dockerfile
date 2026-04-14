@@ -24,8 +24,10 @@ RUN apt-get update \
     && apt-get install -y --no-install-recommends gh \
     && rm -rf /var/lib/apt/lists/* /var/cache/apt/archives/*
 
-# Install the TeX packages required by the paper template
-RUN tlmgr option repository https://mirror.ctan.org/systems/texlive/tlnet \
+# Pin TinyTeX / tlmgr to a specific CTAN mirror and install the LaTeX packages
+# needed by the paper template. Then verify that the required style files exist.
+RUN tlmgr option repository https://ftp.fau.de/ctan/systems/texlive/tlnet \
+    && tlmgr update --self \
     && tlmgr install \
     adjustbox \
     booktabs \
@@ -37,7 +39,15 @@ RUN tlmgr option repository https://mirror.ctan.org/systems/texlive/tlnet \
     latexmk \
     setspace \
     threeparttable \
-    xetex
+    && test -n "$(kpsewhich adjustbox.sty)" \
+    && test -n "$(kpsewhich booktabs.sty)" \
+    && test -n "$(kpsewhich caption.sty)" \
+    && test -n "$(kpsewhich csquotes.sty)" \
+    && test -n "$(kpsewhich endfloat.sty)" \
+    && test -n "$(kpsewhich footmisc.sty)" \
+    && test -n "$(kpsewhich geometry.sty)" \
+    && test -n "$(kpsewhich setspace.sty)" \
+    && test -n "$(kpsewhich threeparttable.sty)"
 
 # uv
 RUN curl -LsSf https://astral.sh/uv/install.sh | sh \
