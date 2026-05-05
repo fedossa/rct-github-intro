@@ -175,6 +175,15 @@ The paper source lives in:
 It is formatted as a small article-style paper so the repository already feels like a miniature research template rather than a single script with a report attached at the end.
 The current template shows one descriptive table, one figure, and one bibliography entry so the reporting workflow stays visible without becoming crowded.
 
+## AI Prompts for Common Tasks
+
+Two ready-made prompts are included to help you work with the project configuration using an LLM assistant.
+
+- **`makefile_prompt.md`** — use this if you want to understand how the `Makefile` works or need help adapting it to your own pipeline.
+- **`docker_devcontainer_prompt.md`** — use this if you run into errors with the `.devcontainer/` setup or want to understand how the `Dockerfile` and `devcontainer.json` interact.
+
+In each file, replace the text inside the `{{ }}` blocks with your own input, then paste the whole prompt into an LLM of your choice.
+
 ## Container Notes
 
 Both Codespaces and the local devcontainer path provide:
