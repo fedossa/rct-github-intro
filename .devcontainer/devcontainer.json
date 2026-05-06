@@ -16,6 +16,18 @@
         "type=volume,target=${containerWorkspaceFolder}/.venv",
         "type=volume,target=/root/.cache/uv"
     ],
+    // Only put UV_PROJECT_ENVIRONMENT here (used by postCreateCommand).
+    // DO NOT touch PATH here.
+    "containerEnv": {
+        "UV_PROJECT_ENVIRONMENT": "${containerWorkspaceFolder}/.venv"
+    },
+    // This is where PATH extension works reliably.
+    "remoteEnv": {
+        "UV_PROJECT_ENVIRONMENT": "${containerWorkspaceFolder}/.venv",
+        "VIRTUAL_ENV": "${containerWorkspaceFolder}/.venv",
+        "PATH": "${containerWorkspaceFolder}/.venv/bin:${containerEnv:PATH}"
+    },
+    "postCreateCommand": "bash -lc 'cd ${containerWorkspaceFolder} && uv sync'",
     "customizations": {
         "vscode": {
             "extensions": [
@@ -27,7 +39,14 @@
                 "george-alisson.html-preview-vscode",
                 "mechatroner.rainbow-csv",
                 "ms-azuretools.vscode-docker"
-            ]
+            ],
+            "settings": {
+                "python.defaultInterpreterPath": "${containerWorkspaceFolder}/.venv/bin/python",
+                "python.terminal.activateEnvironment": true,
+                "python.analysis.extraPaths": [
+                    "${containerWorkspaceFolder}/code/python"
+                ]
+            }
         }
     }
 }
