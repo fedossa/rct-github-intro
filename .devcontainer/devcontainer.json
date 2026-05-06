@@ -30,8 +30,9 @@
     "PATH": "${containerWorkspaceFolder}/.venv/bin:${containerEnv:PATH}"
   },
 
-  "postStartCommand": "bash -lc 'cd ${containerWorkspaceFolder} && uv sync'",
-  "waitFor": "postStartCommand",
+  "postCreateCommand": "bash -lc 'cd ${containerWorkspaceFolder} && uv sync'",
+  "postStartCommand": "bash -lc 'cd ${containerWorkspaceFolder} && test -x .venv/bin/python || uv sync'",
+  "waitFor": "postCreateCommand",
 
   "customizations": {
     "vscode": {
@@ -48,6 +49,7 @@
       "settings": {
         "python.defaultInterpreterPath": "${containerWorkspaceFolder}/.venv/bin/python",
         "python.terminal.activateEnvironment": true,
+        "python.disableInstallationCheck": true,
         "python.analysis.extraPaths": [
           "${containerWorkspaceFolder}/code/python"
         ]
