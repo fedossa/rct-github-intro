@@ -30,8 +30,8 @@
     "PATH": "${containerWorkspaceFolder}/.venv/bin:${containerEnv:PATH}"
   },
 
-  "postCreateCommand": "bash -lc 'cd ${containerWorkspaceFolder} && uv sync'",
-  "waitFor": "postCreateCommand",
+  "postStartCommand": "bash -lc 'cd ${containerWorkspaceFolder} && uv sync'",
+  "waitFor": "postStartCommand",
 
   "customizations": {
     "vscode": {
