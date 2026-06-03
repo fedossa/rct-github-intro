@@ -46,7 +46,7 @@ header-includes:
 library(knitr)
 library(ggplot2)
 
-results <- readRDS("../output/rct-project-template-results.rds")
+results <- readRDS("../output/results.rds")
 descriptive_table <- results$descriptive_table
 scatter_figure <- results$scatter_figure
 table_note <- results$table_note

@@ -4,7 +4,7 @@ suppressPackageStartupMessages({
 
 dir.create("output", recursive = TRUE, showWarnings = FALSE)
 
-analysis_data <- readRDS("data/generated/mtcars_prepared.rds")
+analysis_data <- readRDS("data/generated/prepared_data.rds")
 
 model <- lm(mpg ~ wt + transmission, data = analysis_data)
 model_coefs <- stats::coef(model)
@@ -74,4 +74,4 @@ results <- list(
   highlights = highlights
 )
 
-saveRDS(results, file = "output/rct-project-template-results.rds")
+saveRDS(results, file = "output/results.rds")

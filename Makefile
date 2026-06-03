@@ -1,42 +1,27 @@
-RSCRIPT := Rscript --vanilla
-QUARTO := quarto
+all: output/paper.pdf output/presentation.pdf
 
-PULLED := data/pulled/mtcars_raw.rds
-GENERATED := data/generated/mtcars_prepared.rds
-RESULTS := output/rct-project-template-results.rds
-OLD_RESULTS := output/rct-github-intro-results.rds
-PAPER_BASENAME := rct-project-template-paper.pdf
-OLD_PAPER := output/rct-github-intro-paper.pdf
-PAPER := output/$(PAPER_BASENAME)
-SOURCE := doc/paper.qmd
-
-.PHONY: all clean
-
-all: $(PAPER)
-
-$(PULLED): code/R/pull_data.R
+data/pulled/raw_data.rds: code/R/pull_data.R
 	mkdir -p data/pulled
-	$(RSCRIPT) $<
+	Rscript --vanilla code/R/pull_data.R
 
-$(GENERATED): code/R/prep_data.R $(PULLED)
+data/generated/prepared_data.rds: code/R/prep_data.R data/pulled/raw_data.rds
 	mkdir -p data/generated
-	$(RSCRIPT) $<
+	Rscript --vanilla code/R/prep_data.R
 
-$(RESULTS): code/R/run_analysis.R $(GENERATED)
+output/results.rds: code/R/run_analysis.R data/generated/prepared_data.rds
 	mkdir -p output
-	$(RSCRIPT) $<
+	Rscript --vanilla code/R/run_analysis.R
 
-$(PAPER): $(SOURCE) $(RESULTS)
-	rm -rf .quarto doc/.quarto
-	cd doc && $(QUARTO) render paper.qmd --to pdf --output $(PAPER_BASENAME)
-	rm -f paper.tex paper.log paper.aux paper.out paper.knit.md
-	rm -f $(PAPER_BASENAME)
-	rm -f texput.log doc/texput.log
-	rm -f doc/paper.tex doc/paper.log doc/paper.aux doc/paper.out doc/paper.knit.md doc/paper.fff doc/paper.ttt
+output/paper.pdf: doc/paper.qmd output/results.rds
+	cd doc && quarto render paper.qmd --to pdf --output paper.pdf
+	rm -f doc/paper.tex doc/paper.log doc/paper.aux doc/paper.out doc/paper.knit.md
+	rm -f doc/paper.fff doc/paper.ttt doc/texput.log
+
+output/presentation.pdf: doc/presentation.qmd output/results.rds
+	cd doc && quarto render presentation.qmd --output presentation.pdf
+	rm -f doc/presentation.tex doc/presentation.log doc/presentation.aux doc/presentation.out doc/presentation.knit.md
+	rm -rf output/presentation_files
 
 clean:
-	rm -rf .quarto doc/.quarto
-	rm -f $(PULLED) $(GENERATED) $(RESULTS) $(PAPER) $(OLD_RESULTS) $(OLD_PAPER)
-	rm -f paper.tex paper.log paper.aux paper.out paper.knit.md
-	rm -f texput.log doc/texput.log
-	rm -f doc/paper.tex doc/paper.log doc/paper.aux doc/paper.out doc/paper.knit.md doc/paper.fff doc/paper.ttt
+	rm -rf data/pulled data/generated output .quarto doc/.quarto
+	rm -f doc/*.tex doc/*.log doc/*.aux doc/*.out doc/*.knit.md

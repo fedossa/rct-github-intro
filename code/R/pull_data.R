@@ -6,4 +6,4 @@ mtcars_raw <- transform(
 )
 rownames(mtcars_raw) <- NULL
 
-saveRDS(mtcars_raw, file = "data/pulled/mtcars_raw.rds")
+saveRDS(mtcars_raw, file = "data/pulled/raw_data.rds")

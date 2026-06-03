@@ -1,6 +1,6 @@
 dir.create("data/generated", recursive = TRUE, showWarnings = FALSE)
 
-raw_data <- readRDS("data/pulled/mtcars_raw.rds")
+raw_data <- readRDS("data/pulled/raw_data.rds")
 
 prepared_data <- transform(
   raw_data,
@@ -21,4 +21,4 @@ prepared_data <- prepared_data[
   )
 ]
 
-saveRDS(prepared_data, file = "data/generated/mtcars_prepared.rds")
+saveRDS(prepared_data, file = "data/generated/prepared_data.rds")
