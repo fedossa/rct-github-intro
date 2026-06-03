@@ -18,7 +18,6 @@ from plotnine import (
 
 INPUT_PATH = Path("data/generated/prepared_data.pkl")
 RESULTS_PATH = Path("output/results.pkl")
-FIGURE_PATH = Path("output/scatter_figure.png")
 
 
 def prepare_descriptive_table(data: pd.DataFrame) -> pd.DataFrame:
@@ -74,9 +73,6 @@ def main() -> None:
 
     model = smf.ols("mpg ~ wt + C(transmission)", data=analysis_data).fit()
     descriptive_table = prepare_descriptive_table(analysis_data)
-    scatter_figure = make_scatter_figure(analysis_data)
-    scatter_figure.save(FIGURE_PATH, width=6.5, height=4.3, dpi=300, verbose=False)
-
     highlights = {
         "sample_size": int(len(analysis_data)),
         "avg_mpg": round(float(analysis_data["mpg"].mean()), 1),
@@ -96,7 +92,7 @@ def main() -> None:
 
     results = {
         "descriptive_table": descriptive_table,
-        "scatter_figure_path": str(FIGURE_PATH),
+        "analysis_data": analysis_data,
         "table_note": (
             "This table summarizes the prepared mtcars sample by transmission type. "
             "Fuel efficiency is measured in miles per gallon and weight is measured "

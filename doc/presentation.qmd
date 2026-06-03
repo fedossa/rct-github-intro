@@ -26,15 +26,19 @@ header-includes:
 #| include: false
 
 import pickle
+import sys
 from pathlib import Path
-from IPython.display import Image, display
+
+sys.path.insert(0, "../code/python")
+from run_analysis import make_scatter_figure
+from plotnine import theme, theme_minimal
 
 results_path = Path("../output/results.pkl")
 with results_path.open("rb") as results_file:
     results = pickle.load(results_file)
 
 descriptive_table = results["descriptive_table"]
-scatter_figure_path = (Path("..") / results["scatter_figure_path"]).resolve()
+analysis_data = results["analysis_data"]
 table_note = results["table_note"]
 highlights = results["highlights"]
 
@@ -98,7 +102,7 @@ render_table(descriptive_table, table_note)
 
 ```{python}
 #| label: fig_scatter
-display(Image(filename=str(scatter_figure_path)))
+(make_scatter_figure(analysis_data) + theme_minimal(base_size=8) + theme(figure_size=(3.6, 2.7))).draw()
 ```
 
 
