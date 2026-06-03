@@ -2,6 +2,11 @@
 .DS_Store
 *.log
 
+# Generated data and output
+data/pulled/
+data/generated/
+output/
+
 # R / Quarto
 .Rproj.user
 .Rhistory
