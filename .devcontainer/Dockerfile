@@ -65,6 +65,9 @@ RUN set -eux; \
   dpkg -i /tmp/quarto.deb; \
   rm /tmp/quarto.deb
 
+RUN echo "rstudio ALL=(ALL) NOPASSWD:ALL" > /etc/sudoers.d/rstudio \
+ && chmod 0440 /etc/sudoers.d/rstudio
+
 RUN mkdir -p /workspaces \
  && chown -R rstudio:rstudio /home/rstudio /opt/TinyTeX /workspaces
 

@@ -19,7 +19,7 @@
     "memory": "4gb",
     "storage": "16gb"
   },
-  "postCreateCommand": "git config --global --add safe.directory ${containerWorkspaceFolder}",
+  "postCreateCommand": "sudo chown -R rstudio:rstudio ${containerWorkspaceFolder} && git config --global --add safe.directory ${containerWorkspaceFolder}",
   "customizations": {
     "vscode": {
       "extensions": [
