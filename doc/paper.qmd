@@ -50,7 +50,7 @@ import pickle
 from pathlib import Path
 from IPython.display import Image, display
 
-results_path = Path("../output/rct-project-template-results.pkl")
+results_path = Path("../output/results.pkl")
 with results_path.open("rb") as results_file:
     results = pickle.load(results_file)
 

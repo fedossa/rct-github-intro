@@ -3,7 +3,7 @@ from pathlib import Path
 from plotnine.data import mtcars
 
 
-OUTPUT_PATH = Path("data/pulled/mtcars_raw.pkl")
+OUTPUT_PATH = Path("data/pulled/raw_data.pkl")
 
 
 def main() -> None:

@@ -1,47 +1,34 @@
 UV := uv
-UV_SYNC := $(UV) sync --managed-python --locked
 PYTHON := .venv/bin/python
-QUARTO := quarto
 QUARTO_PYTHON := $(abspath $(PYTHON))
 
-PULLED := data/pulled/mtcars_raw.pkl
-GENERATED := data/generated/mtcars_prepared.pkl
-RESULTS := output/rct-project-template-results.pkl
-FIGURE := output/rct-project-template-scatter-figure.png
-PAPER_BASENAME := rct-project-template-paper.pdf
-PAPER := output/$(PAPER_BASENAME)
-SOURCE := doc/paper.qmd
-
-.PHONY: all clean
-
-all: $(PAPER)
+all: output/paper.pdf output/presentation.pdf
 
 $(PYTHON): pyproject.toml uv.lock .python-version
-	$(UV_SYNC)
+	$(UV) sync --managed-python --locked
 
-$(PULLED): code/python/pull_data.py $(PYTHON)
+data/pulled/raw_data.pkl: code/python/pull_data.py $(PYTHON)
 	mkdir -p data/pulled
-	$(PYTHON) $<
+	$(PYTHON) code/python/pull_data.py
 
-$(GENERATED): code/python/prep_data.py $(PULLED) $(PYTHON)
+data/generated/prepared_data.pkl: code/python/prep_data.py data/pulled/raw_data.pkl $(PYTHON)
 	mkdir -p data/generated
-	$(PYTHON) $<
+	$(PYTHON) code/python/prep_data.py
 
-$(RESULTS): code/python/run_analysis.py $(GENERATED) $(PYTHON)
+output/results.pkl: code/python/run_analysis.py data/generated/prepared_data.pkl $(PYTHON)
 	mkdir -p output
-	$(PYTHON) $<
+	$(PYTHON) code/python/run_analysis.py
 
-$(PAPER): $(SOURCE) $(RESULTS) $(PYTHON)
-	rm -rf .quarto doc/.quarto
-	cd doc && QUARTO_PYTHON=$(QUARTO_PYTHON) $(QUARTO) render paper.qmd --to pdf --output $(PAPER_BASENAME)
-	rm -f paper.tex paper.log paper.aux paper.out paper.knit.md
-	rm -f $(PAPER_BASENAME)
-	rm -f texput.log doc/texput.log
-	rm -f doc/paper.tex doc/paper.log doc/paper.aux doc/paper.out doc/paper.knit.md doc/paper.fff doc/paper.ttt
+output/paper.pdf: doc/paper.qmd output/results.pkl $(PYTHON)
+	cd doc && QUARTO_PYTHON=$(QUARTO_PYTHON) quarto render paper.qmd --to pdf --output paper.pdf
+	rm -f doc/paper.tex doc/paper.log doc/paper.aux doc/paper.out doc/paper.knit.md
+	rm -f doc/paper.fff doc/paper.ttt doc/texput.log
+
+output/presentation.pdf: doc/presentation.qmd output/results.pkl $(PYTHON)
+	cd doc && QUARTO_PYTHON=$(QUARTO_PYTHON) quarto render presentation.qmd --output presentation.pdf
+	rm -f doc/presentation.tex doc/presentation.log doc/presentation.aux doc/presentation.out doc/presentation.knit.md
+	rm -rf output/presentation_files
 
 clean:
-	rm -rf .quarto doc/.quarto
-	rm -f $(PULLED) $(GENERATED) $(RESULTS) $(FIGURE) $(PAPER)
-	rm -f paper.tex paper.log paper.aux paper.out paper.knit.md
-	rm -f texput.log doc/texput.log
-	rm -f doc/paper.tex doc/paper.log doc/paper.aux doc/paper.out doc/paper.knit.md doc/paper.fff doc/paper.ttt
+	rm -rf data/pulled data/generated output .quarto doc/.quarto
+	rm -f doc/*.tex doc/*.log doc/*.aux doc/*.out doc/*.knit.md

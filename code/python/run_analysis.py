@@ -16,9 +16,9 @@ from plotnine import (
 )
 
 
-INPUT_PATH = Path("data/generated/mtcars_prepared.pkl")
-RESULTS_PATH = Path("output/rct-project-template-results.pkl")
-FIGURE_PATH = Path("output/rct-project-template-scatter-figure.png")
+INPUT_PATH = Path("data/generated/prepared_data.pkl")
+RESULTS_PATH = Path("output/results.pkl")
+FIGURE_PATH = Path("output/scatter_figure.png")
 
 
 def prepare_descriptive_table(data: pd.DataFrame) -> pd.DataFrame:

@@ -4,8 +4,8 @@ import numpy as np
 import pandas as pd
 
 
-INPUT_PATH = Path("data/pulled/mtcars_raw.pkl")
-OUTPUT_PATH = Path("data/generated/mtcars_prepared.pkl")
+INPUT_PATH = Path("data/pulled/raw_data.pkl")
+OUTPUT_PATH = Path("data/generated/prepared_data.pkl")
 
 
 def main() -> None:
