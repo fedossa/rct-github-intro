@@ -31,6 +31,7 @@ RUN tlmgr option repository https://ftp.fau.de/ctan/systems/texlive/tlnet \
     && tlmgr update --self \
     && tlmgr install \
     adjustbox \
+    beamer \
     booktabs \
     caption \
     csquotes \
@@ -41,6 +42,7 @@ RUN tlmgr option repository https://ftp.fau.de/ctan/systems/texlive/tlnet \
     setspace \
     threeparttable \
     && test -n "$(kpsewhich adjustbox.sty)" \
+    && test -n "$(kpsewhich beamer.cls)" \
     && test -n "$(kpsewhich booktabs.sty)" \
     && test -n "$(kpsewhich caption.sty)" \
     && test -n "$(kpsewhich csquotes.sty)" \
