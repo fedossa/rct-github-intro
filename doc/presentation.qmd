@@ -57,6 +57,8 @@ def render_table(data, note):
             cells.append(f"{value:.1f}" if isinstance(value, float) else str(value))
         table_lines.append(" & ".join(cells) + "\\\\")
     table_lines.extend(["\\bottomrule", "\\end{tabular}"])
+    print("\\centering")
+    print("\\footnotesize")
     print("\n".join(table_lines))
 ```
 
