@@ -26,6 +26,32 @@ RUN install2.r --error --skipinstalled \
 RUN Rscript -e "tinytex::install_tinytex(dir = '/opt/TinyTeX', force = TRUE)" \
  && ln -sf /opt/TinyTeX/bin/*/* /usr/local/bin/
 
+# Pre-install LaTeX packages needed by the paper and presentation
+RUN tlmgr option repository https://ftp.fau.de/ctan/systems/texlive/tlnet \
+ && tlmgr update --self \
+ && tlmgr install \
+      adjustbox \
+      beamer \
+      booktabs \
+      caption \
+      csquotes \
+      endfloat \
+      footmisc \
+      geometry \
+      latexmk \
+      setspace \
+      threeparttable \
+ && test -n "$(kpsewhich adjustbox.sty)" \
+ && test -n "$(kpsewhich beamer.cls)" \
+ && test -n "$(kpsewhich booktabs.sty)" \
+ && test -n "$(kpsewhich caption.sty)" \
+ && test -n "$(kpsewhich csquotes.sty)" \
+ && test -n "$(kpsewhich endfloat.sty)" \
+ && test -n "$(kpsewhich footmisc.sty)" \
+ && test -n "$(kpsewhich geometry.sty)" \
+ && test -n "$(kpsewhich setspace.sty)" \
+ && test -n "$(kpsewhich threeparttable.sty)"
+
 RUN set -eux; \
   QUARTO_VERSION=1.6.40; \
   ARCH="$(dpkg --print-architecture)"; \
