@@ -1,0 +1,125 @@
+---
+title: "A Minimal Research Project Template"
+subtitle: "An Illustrative Example in Python"
+author: "Course Template"
+institute: "Your University"
+date: last-modified
+date-format: long
+fontsize: "10pt"
+format:
+  beamer:
+    slide-level: 3
+    number-sections: false
+    toc: false
+classoption: "aspectratio=169"
+execute:
+  echo: false
+  message: false
+  warning: false
+header-includes:
+  - \usepackage{booktabs}
+  - \usepackage{graphicx}
+---
+
+```{python}
+#| label: setup
+#| include: false
+
+import pickle
+from pathlib import Path
+from IPython.display import Image, display
+
+results_path = Path("../output/results.pkl")
+with results_path.open("rb") as results_file:
+    results = pickle.load(results_file)
+
+descriptive_table = results["descriptive_table"]
+scatter_figure_path = (Path("..") / results["scatter_figure_path"]).resolve()
+table_note = results["table_note"]
+highlights = results["highlights"]
+
+
+def render_table(data, note):
+    table_lines = [
+        "\\begin{tabular}[t]{lrrrr}",
+        "\\toprule",
+        " & ".join(str(c) for c in data.columns) + "\\\\",
+        "\\midrule",
+    ]
+    for row in data.itertuples(index=False, name=None):
+        cells = []
+        for value in row:
+            value = value.item() if hasattr(value, "item") else value
+            cells.append(f"{value:.1f}" if isinstance(value, float) else str(value))
+        table_lines.append(" & ".join(cells) + "\\\\")
+    table_lines.extend(["\\bottomrule", "\\end{tabular}"])
+    print("\n".join(table_lines))
+```
+
+
+# Motivation
+
+### About This Template
+
+- A minimal reproducible research workflow in Python
+- Data flow: **pull** → **prepare** → **analyze** → **present**
+- Built on the `mtcars` dataset as a teaching example
+- Each stage writes a durable artifact to disk; the paper and presentation read from the same results file
+
+
+### The Research Question
+
+- How does vehicle weight relate to fuel efficiency?
+- Does transmission type matter after controlling for weight?
+
+```{python}
+#| output: asis
+print(
+    f"- Sample: {highlights['sample_size']} vehicles from the mtcars dataset\n"
+    f"- Average fuel efficiency: {highlights['avg_mpg']} mpg; "
+    f"heaviest vehicle: {highlights['heaviest_model']}"
+)
+```
+
+
+# Data
+
+### Descriptive Statistics
+
+```{python}
+#| output: asis
+render_table(descriptive_table, table_note)
+```
+
+
+# Results
+
+### Weight vs. Fuel Efficiency
+
+```{python}
+#| label: fig_scatter
+display(Image(filename=str(scatter_figure_path)))
+```
+
+
+### Key Findings
+
+```{python}
+#| output: asis
+print(
+    f"- A 1,000 lb increase in weight is associated with a "
+    f"**{highlights['weight_slope']} mpg** change\n"
+    f"- Manual transmission cars show a **{highlights['manual_effect']} mpg** "
+    f"difference vs. automatic after controlling for weight\n"
+    f"- {highlights['interpretation']}"
+)
+```
+
+
+# Conclusion
+
+### Takeaways
+
+- The template keeps all moving parts visible while staying small enough to understand in one sitting
+- Replace the toy `mtcars` data with your own; the workflow shape stays the same
+- The paper and this presentation both read from `output/results.pkl` — run the pipeline once, render both outputs
