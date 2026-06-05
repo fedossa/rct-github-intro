@@ -2,8 +2,7 @@ FROM ghcr.io/quarto-dev/quarto-full:latest
 
 ENV DEBIAN_FRONTEND=noninteractive \
     TZ=UTC \
-    LANG=C.UTF-8 \
-    UV_MANAGED_PYTHON=1
+    LANG=C.UTF-8
 
 # Extra tools for this repo
 RUN apt-get update \
